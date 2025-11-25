@@ -1,7 +1,22 @@
-import { createDbConnection } from "./db";
+import { AuroraDSQLClient } from "@aws/aurora-dsql-node-postgres-connector";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { owner } from "./schema";
 import { eq } from "drizzle-orm";
 import "dotenv/config";
+
+async function createDbConnection(clusterEndpoint: string, user: string) {
+  const client = new AuroraDSQLClient({
+    host: clusterEndpoint,
+    user: user,
+  });
+
+  await client.connect();
+
+  return {
+    db: drizzle(client, { schema: { owner } }),
+    client,
+  };
+}
 
 async function main() {
   const clusterEndpoint = process.env.CLUSTER_ENDPOINT;
@@ -29,9 +44,6 @@ async function main() {
 
     const result = await db.select().from(owner).where(eq(owner.name, "mori"));
     console.log("Selected:", result);
-
-    await db.delete(owner).where(eq(owner.name, "John Doe"));
-    console.log("Deleted successfully");
   } catch (error) {
     console.error("Error:", error);
     throw error;
