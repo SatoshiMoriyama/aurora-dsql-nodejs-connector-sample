@@ -36,7 +36,7 @@ async function main() {
       .values({
         name: "mori",
         city: "sapporo",
-        telephone: "070-9999-9999",
+        telephone: "070-XXXX-XXXX",
       })
       .returning();
 
